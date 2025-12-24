@@ -13,7 +13,7 @@ int main();
 
 // fix the tail stacking on top of itself when a new one spawns
 
-// else if statement for gameover in Game()
+// remove classes and just make it a struct
 
 enum eDirection {
     STOP = 0,
@@ -35,55 +35,11 @@ int width = 30;
 int height = 30;
 int fruitX, fruitY;
 
-class Snakes {
-public:
-    Snakes(int inX, int inY) {
-        xVal = inX;
-        yVal = inY;
-    }
-
-    ~Snakes() {
-        
-    }
-
-    int GetX();
-    int GetY();
-    eDirection GetDir();
-
-    void SetX(int num);
-    void SetY(int num);
-    void SetDir(eDirection inDir);
-
-private:
-    int xVal;
-    int yVal;
-    
-    eDirection nDir = STOP;
+struct Snakes {
+    int x;
+    int y;
+    eDirection inDir = STOP;
 };
-
-int Snakes::GetX() {
-    return xVal;
-}
-
-int Snakes::GetY() {
-    return yVal;
-}
-
-eDirection Snakes::GetDir() {
-    return nDir;
-}
-
-void Snakes::SetX(int num) {
-    xVal = num;
-}
-
-void Snakes::SetY(int num) {
-    yVal = num;
-}
-
-void Snakes::SetDir(eDirection inDir) {
-    nDir = inDir;
-}
 
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -93,8 +49,6 @@ bool checked = false;
 int counter = 0;
 
 void NewAppleSpawn() {
-    srand(time(NULL));
-
     fruitX = rand () % 28;
     fruitX += 1;
 
@@ -123,14 +77,14 @@ void Draw() {
         for (int j = 0; j < height; j++) {
             bool printed = false;
             for (Snakes k: snakeList) {
-                if (k.GetX() == snakeList[0].GetX() && k.GetY() == snakeList[0].GetY()) {
-                    if (i == snakeList[0].GetY() && j == snakeList[0].GetX()) {
+                if (k.x == snakeList[0].x && k.y == snakeList[0].y) {
+                    if (i == snakeList[0].y && j == snakeList[0].x) {
                         cout << "O";
                         printed = true;
                     }
                 }
                 
-                else if (i == k.GetY() && j == k.GetX()) {
+                else if (i == k.y && j == k.x) {
                     cout << "o";
                     
                     printed = true;
@@ -160,18 +114,18 @@ void Draw() {
 
 void CalculateNextXY() {
     for (int i = 0; i < snakeList.size(); i++) {
-        switch (snakeList[i].GetDir()) {
+        switch (snakeList[i].inDir) {
             case LEFT:
-                snakeList[i].SetX(snakeList[i].GetX() - 1);
+                snakeList[i].x = (snakeList[i].x - 1);
                 break;
             case RIGHT:
-                snakeList[i].SetX(snakeList[i].GetX() + 1);
+                snakeList[i].x = (snakeList[i].x + 1);
                 break;
             case UP:
-                snakeList[i].SetY(snakeList[i].GetY() - 1);
+                snakeList[i].y = (snakeList[i].y - 1);
                 break;
             case DOWN:
-                snakeList[i].SetY(snakeList[i].GetY() + 1);
+                snakeList[i].y = (snakeList[i].y + 1);
                 break;
             case STOP:
                 break;
@@ -184,18 +138,18 @@ void Game() {
     spawned = false;
 
     // spawns a tail
-    if (snakeList[0].GetY() == fruitX && snakeList[0].GetX() == fruitY) {
-        snakeList.insert(snakeList.begin(), Snakes(fruitY, fruitX));
+    if (snakeList[0].y == fruitX && snakeList[0].x == fruitY) {
+        snakeList.insert(snakeList.begin(), {fruitY, fruitX});
         NewAppleSpawn();
         //spawned = true;
     }
     
     for (int i = snakeList.size() - 1; i >= 0; i--) {
         if (i == 0) {
-            snakeList[0].SetDir(dir);
+            snakeList[0].inDir = (dir);
         }
         else {
-            snakeList[i].SetDir(snakeList[i-1].GetDir());
+            snakeList[i].inDir = (snakeList[i-1].inDir);
         }
     }
 
@@ -206,21 +160,21 @@ void Game() {
     // cout << snakeList.size();
 
     // game over logic
-    if (snakeList[0].GetX() == 0) { // left
+    if (snakeList[0].x == 0) { // left
         gameOver = true;
     }
-    if (snakeList[0].GetX() == width) { // right
+    if (snakeList[0].x == width) { // right
         gameOver = true;
     }
-    if (snakeList[0].GetY() == height) { // up
+    if (snakeList[0].y == height) { // up
         gameOver = true;
     }
-    if (snakeList[0].GetY() == 0) { // down
+    if (snakeList[0].y == 0) { // down
         gameOver = true;
     }
 
     for (int i = 1; i < snakeList.size(); i++) {
-        if (snakeList[i].GetX() == snakeList[0].GetX() && snakeList[i].GetY() == snakeList[0].GetY()) {
+        if (snakeList[i].x == snakeList[0].x && snakeList[i].y == snakeList[0].y) {
             gameOver = true;
         }
     }
@@ -272,9 +226,8 @@ void Movement() {
 }
 
 void Setup() {
-    Snakes snakeHead((width/2), (height/2));
+    snakeList.push_back({width/2, height/2});
 
-    snakeList.insert(snakeList.begin(), snakeHead);
     //snakeList.insert(snakeList.end(), Snakes(14, 15)); // test tail
     //snakeList.insert(snakeList.end(), Snakes(13, 15)); // test tail
     NewAppleSpawn();
@@ -292,5 +245,6 @@ void Setup() {
 }
 
 int main() {
+    srand(time(NULL));
     Setup();
 }
