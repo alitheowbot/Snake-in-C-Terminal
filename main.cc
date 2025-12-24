@@ -158,7 +158,7 @@ void Draw() {
     }
 }
 
-void CalculateNextXY(vector<Snakes> inList) {
+void CalculateNextXY() {
     for (int i = 0; i < snakeList.size(); i++) {
         switch (snakeList[i].GetDir()) {
             case LEFT:
@@ -200,7 +200,7 @@ void Game() {
     }
 
     if (dir != STOP && !spawned) {
-        CalculateNextXY(snakeList);
+        CalculateNextXY();
     }
     // cout << snakeList[0].GetX();
     // cout << snakeList.size();
@@ -284,9 +284,10 @@ void Setup() {
 
     while (!gameOver) {
         system("cls");
-        Sleep(20);
+
         Movement();
         Game();
+        Sleep(10);
     }
 }
 
