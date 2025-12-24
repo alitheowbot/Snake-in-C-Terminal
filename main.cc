@@ -10,12 +10,8 @@
 int main();
 
 // TODO: 
-// add a clear screen method
 
-// rework the way movement is calculated and maybe even how tails are spawned
-
-// After you get this working, you can work on spawning in the tails for each apple aten (maybe just a set X and Y value for now) 
-// After you get this working, you can work on having the tails follow the node in front of it
+// fix the tail stacking on top of itself when a new one spawns
 
 // else if statement for gameover in Game()
 
@@ -52,13 +48,17 @@ public:
 
     int GetX();
     int GetY();
+    eDirection GetDir();
 
     void SetX(int num);
     void SetY(int num);
+    void SetDir(eDirection inDir);
 
 private:
     int xVal;
     int yVal;
+    
+    eDirection nDir = STOP;
 };
 
 int Snakes::GetX() {
@@ -69,6 +69,10 @@ int Snakes::GetY() {
     return yVal;
 }
 
+eDirection Snakes::GetDir() {
+    return nDir;
+}
+
 void Snakes::SetX(int num) {
     xVal = num;
 }
@@ -77,6 +81,9 @@ void Snakes::SetY(int num) {
     yVal = num;
 }
 
+void Snakes::SetDir(eDirection inDir) {
+    nDir = inDir;
+}
 
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -104,9 +111,10 @@ void Draw() {
 
     cout << endl;
 
-    for (Snakes ma: snakeList) {
+    /*for (Snakes ma: snakeList) {
         cout << ma.GetX() << " " << ma.GetY() << endl;
-    }
+    }*/
+
     // body/game part of board
     for (int i = 0; i < width; i++) {
         checked = false;
@@ -124,6 +132,7 @@ void Draw() {
                 
                 else if (i == k.GetY() && j == k.GetX()) {
                     cout << "o";
+                    
                     printed = true;
                 }
             }
@@ -149,59 +158,25 @@ void Draw() {
     }
 }
 
-void CalculateNextXY(vector<Snakes> inList, eDirection inDir) {
-    // change x/y values based on our direction
-
-    if (inList[0].GetX() != snakeList[0].GetX() && inList[0].GetY() != snakeList[0].GetY()) inDir = tailDir;
-    
-    int tmpX = inList[0].GetX();
-    int tmpY = inList[0].GetY();
-    // prob can delete this ^
-
-    int pos = 0;
-    pos = (counter - snakeList.size());
-    pos = abs(pos);
-
-    int newX = tmpX;
-    int newY = tmpY;
-
-    if (inDir == LEFT) {
-        newX -= 1;
+void CalculateNextXY(vector<Snakes> inList) {
+    for (int i = 0; i < snakeList.size(); i++) {
+        switch (snakeList[i].GetDir()) {
+            case LEFT:
+                snakeList[i].SetX(snakeList[i].GetX() - 1);
+                break;
+            case RIGHT:
+                snakeList[i].SetX(snakeList[i].GetX() + 1);
+                break;
+            case UP:
+                snakeList[i].SetY(snakeList[i].GetY() - 1);
+                break;
+            case DOWN:
+                snakeList[i].SetY(snakeList[i].GetY() + 1);
+                break;
+            case STOP:
+                break;
+        }
     }
-    if (inDir == RIGHT) {
-        newX += 1;
-    }
-    if (inDir == UP) {
-        newY -= 1;
-    }
-    if (inDir == DOWN) {
-        newY += 1;
-    }
-
-    if (newY == fruitX && newX == fruitY) {
-        snakeList.insert(snakeList.begin(), Snakes(fruitY, fruitX));
-        NewAppleSpawn();
-        spawned = true;
-    }
-
-    if (!spawned) {
-        snakeList[pos].SetX(newX);
-        snakeList[pos].SetY(newY);
-    }
-    else {
-        snakeList[pos].SetX(tmpX);
-        snakeList[pos].SetY(tmpX);
-    }
-    
-
-    if (inList.size() > 1) {
-        vector<Snakes> tmpList = inList;
-        tmpList.erase(tmpList.begin());
-        counter -= 1;
-        CalculateNextXY(tmpList, inDir);
-    }
-    
-    
 }
 
 void Game() {
@@ -209,15 +184,23 @@ void Game() {
     spawned = false;
 
     // spawns a tail
-    /*if (snakeList[0].GetY() == fruitX && snakeList[0].GetX() == fruitY) {
+    if (snakeList[0].GetY() == fruitX && snakeList[0].GetX() == fruitY) {
         snakeList.insert(snakeList.begin(), Snakes(fruitY, fruitX));
         NewAppleSpawn();
-        spawned = true;
-    }*/
+        //spawned = true;
+    }
     
+    for (int i = snakeList.size() - 1; i >= 0; i--) {
+        if (i == 0) {
+            snakeList[0].SetDir(dir);
+        }
+        else {
+            snakeList[i].SetDir(snakeList[i-1].GetDir());
+        }
+    }
 
     if (dir != STOP && !spawned) {
-        CalculateNextXY(snakeList, dir);
+        CalculateNextXY(snakeList);
     }
     // cout << snakeList[0].GetX();
     // cout << snakeList.size();
@@ -234,6 +217,12 @@ void Game() {
     }
     if (snakeList[0].GetY() == 0) { // down
         gameOver = true;
+    }
+
+    for (int i = 1; i < snakeList.size(); i++) {
+        if (snakeList[i].GetX() == snakeList[0].GetX() && snakeList[i].GetY() == snakeList[0].GetY()) {
+            gameOver = true;
+        }
     }
     
     
@@ -294,6 +283,7 @@ void Setup() {
     }
 
     while (!gameOver) {
+        system("cls");
         Sleep(20);
         Movement();
         Game();
@@ -302,5 +292,4 @@ void Setup() {
 
 int main() {
     Setup();
-    
 }
