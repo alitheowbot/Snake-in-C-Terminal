@@ -119,12 +119,12 @@ void NewAppleSpawn() {
 
     // check if its the same as snake tails
     for (int i = 0; i <= snakeList.size() - 1; i++) {
-        if (snakeList[i].GetY() == fruitX && snakeList[i].GetX() == fruitY) {
-            NewAppleSpawn();
-            break;
-        }
-        else {
-            continue;
+        while (snakeList[i].GetY() == fruitX && snakeList[i].GetX() == fruitY) {
+            fruitX = rand () % 28;
+            fruitX += 1;
+
+            fruitY = rand () % 28;
+            fruitY += 1;
         }
     }
     
@@ -280,6 +280,8 @@ void Game() {
     else {
         snakeList.insert(snakeList.begin(), Snakes(fruitY, fruitX, dir));
         NewAppleSpawn();
+        checked = false;
+        Draw();
         doomsDay = false;
     }
 
