@@ -9,11 +9,17 @@
 
 int main();
 
-// TODO: 
+// final update as of 1/4/26:
+// fixed all of the things in this todo list
 
-// fix the tail stacking on top of itself when a new one spawns
+    // TODO: 
 
-// else if statement for gameover in Game()
+    // fix the tail stacking on top of itself when a new one spawns // 1/4/26: i made a thing that tells u the tail x and y and i found that i think im spawning 
+
+    // else if statement for gameover in Game() // 1/4/26: WHAT DOES THIS MEAN? 
+
+// very happy with the game. funny looking spaghetti code, but runs really smoothly.
+
 
 enum eDirection {
     STOP = 0,
@@ -97,6 +103,7 @@ void Snakes::SetDir(eDirection inDir) {
 /////////////////////////////////////////////////////////////////////////////////
 
 vector<Snakes> snakeList;
+bool doomsDay = false;
 bool cancelDraw = false;
 bool checked = false;
 int counter = 0;
@@ -109,6 +116,18 @@ void NewAppleSpawn() {
 
     fruitY = rand () % 28;
     fruitY += 1;
+
+    // check if its the same as snake tails
+    for (int i = 0; i <= snakeList.size() - 1; i++) {
+        if (snakeList[i].GetY() == fruitX && snakeList[i].GetX() == fruitY) {
+            NewAppleSpawn();
+            break;
+        }
+        else {
+            continue;
+        }
+    }
+    
 }
 
 void Draw() {
@@ -167,8 +186,9 @@ void Draw() {
     // Scoreboard/Debugging Information
     if (!checked) {
         cout << "\nHead/Tail information:\n";
+        cout << "Fruit Location: X: " << fruitX << " Y: " << fruitY << endl;
         cout << "----   X | Y   ---- \n";
-        for (int i = 0; i < snakeList.size() - 1; i++) {
+        for (int i = 0; i <= snakeList.size() - 1; i++) {
             cout << "Tail " << i << " " << snakeList[i].GetX() << " | " << snakeList[i].GetY() << endl; 
         }
         checked = true;
@@ -191,64 +211,79 @@ void CalculateNextXY() {
                 snakeList[i].SetY(snakeList[i].GetY() + 1);
                 break;
             case STOP:
+                cout << "HEY OVER HERE!";
                 break;
         }
     }
 }
 
 void Game() {
-    counter = snakeList.size();
+    vector<Snakes> clonedList = snakeList;
     spawned = false;
 
-    // spawns a tail
-    if (snakeList[0].GetY() == fruitX && snakeList[0].GetX() == fruitY) {
-        snakeList.insert(snakeList.begin(), Snakes(fruitY, fruitX));
-        NewAppleSpawn();
-        //spawned = true;
-    }
-    
-    for (int i = snakeList.size() - 1; i >= 0; i--) {
-        if (i == 0) {
-            snakeList[0].SetDir(dir);
-        }
-        else {
-            snakeList[i].SetDir(snakeList[i-1].GetDir());
-        }
-    }
-
-    if (dir != STOP && !spawned) {
+    if (dir != STOP /*&& !spawned*/) {
         CalculateNextXY();
     }
-    // cout << snakeList[0].GetX();
-    // cout << snakeList.size();
-
-    // game over logic
-    if (snakeList[0].GetX() == 0) { // left
-        gameOver = true;
-    }
-    if (snakeList[0].GetX() == width) { // right
-        gameOver = true;
-    }
-    if (snakeList[0].GetY() == height) { // up
-        gameOver = true;
-    }
-    if (snakeList[0].GetY() == 0) { // down
-        gameOver = true;
+    if (snakeList[0].GetY() == fruitX && snakeList[0].GetX() == fruitY) {
+        doomsDay = true;
+        snakeList = clonedList;
+        //spawned = true;
     }
 
-    for (int i = 1; i < snakeList.size(); i++) {
-        if (snakeList[i].GetX() == snakeList[0].GetX() && snakeList[i].GetY() == snakeList[0].GetY()) {
+    if (!doomsDay) {
+            // spawns a tail
+        
+        
+        for (int i = snakeList.size() - 1; i >= 0; i--) {
+            if (i == 0) {
+                snakeList[0].SetDir(dir);
+            }
+            else {
+                snakeList[i].SetDir(snakeList[i-1].GetDir());
+            }
+        }
+
+        
+
+        
+        // cout << snakeList[0].GetX();
+        // cout << snakeList.size();
+
+        // game over logic
+        if (snakeList[0].GetX() == 0) { // left
             gameOver = true;
         }
-    }
-    
-    
+        if (snakeList[0].GetX() == width) { // right
+            gameOver = true;
+        }
+        if (snakeList[0].GetY() == height) { // up
+            gameOver = true;
+        }
+        if (snakeList[0].GetY() == 0) { // down
+            gameOver = true;
+        }
 
-    if (gameOver) main();
-    else {
-        checked = false;
-        Draw();
+        for (int i = 1; i < snakeList.size(); i++) {
+            if (snakeList[i].GetX() == snakeList[0].GetX() && snakeList[i].GetY() == snakeList[0].GetY()) {
+                gameOver = true;
+            }
+        }
+        
+        
+
+        if (gameOver) main();
+        else {
+            checked = false;
+            Draw();
+        }
     }
+    else {
+        snakeList.insert(snakeList.begin(), Snakes(fruitY, fruitX, dir));
+        NewAppleSpawn();
+        doomsDay = false;
+    }
+
+    
 }
 
 void Movement() {
@@ -303,7 +338,7 @@ void Setup() {
     }
 
     while (!gameOver) {
-        system("cls");
+        //system("cls");
 
         Movement();
         Game();
