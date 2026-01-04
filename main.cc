@@ -40,6 +40,15 @@ public:
     Snakes(int inX, int inY) {
         xVal = inX;
         yVal = inY;
+
+        nDir = STOP;
+    }
+
+    Snakes(int inX, int inY, eDirection inDir) {
+        xVal = inX;
+        yVal = inY;
+
+        nDir = inDir;
     }
 
     ~Snakes() {
@@ -58,7 +67,7 @@ private:
     int xVal;
     int yVal;
     
-    eDirection nDir = STOP;
+    eDirection nDir;
 };
 
 int Snakes::GetX() {
@@ -117,8 +126,6 @@ void Draw() {
 
     // body/game part of board
     for (int i = 0; i < width; i++) {
-        checked = false;
-        
         cout << "#";
         for (int j = 0; j < height; j++) {
             bool printed = false;
@@ -146,6 +153,7 @@ void Draw() {
             
         }
         cout << "#";
+
         cout << endl;
     }
         
@@ -156,10 +164,19 @@ void Draw() {
     for (int i = 0; i < width - 1; i++) {
         cout << "#";
     }
+    // Scoreboard/Debugging Information
+    if (!checked) {
+        cout << "\nHead/Tail information:\n";
+        cout << "----   X | Y   ---- \n";
+        for (int i = 0; i < snakeList.size() - 1; i++) {
+            cout << "Tail " << i << " " << snakeList[i].GetX() << " | " << snakeList[i].GetY() << endl; 
+        }
+        checked = true;
+    }
 }
 
 void CalculateNextXY() {
-    for (int i = 0; i < snakeList.size(); i++) {
+    for (int i = snakeList.size() - 1; i >= 0; i--) {
         switch (snakeList[i].GetDir()) {
             case LEFT:
                 snakeList[i].SetX(snakeList[i].GetX() - 1);
@@ -228,7 +245,10 @@ void Game() {
     
 
     if (gameOver) main();
-    else Draw();
+    else {
+        checked = false;
+        Draw();
+    }
 }
 
 void Movement() {
