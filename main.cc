@@ -184,7 +184,7 @@ void Draw() {
         cout << "#";
     }
     // Scoreboard/Debugging Information
-    if (!checked) {
+    /*if (!checked) {
         cout << "\nHead/Tail information:\n";
         cout << "Fruit Location: X: " << fruitX << " Y: " << fruitY << endl;
         cout << "----   X | Y   ---- \n";
@@ -192,7 +192,7 @@ void Draw() {
             cout << "Tail " << i << " " << snakeList[i].GetX() << " | " << snakeList[i].GetY() << endl; 
         }
         checked = true;
-    }
+    }*/
 }
 
 void CalculateNextXY() {
