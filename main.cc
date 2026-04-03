@@ -9,6 +9,11 @@
 
 int main();
 
+// UPDATE 
+// 4/3/2026: 
+// After reviewing the code (and the lack of comments), I can confirm that AI will never be able to replicate this masterpiece.
+// I have cleaned up the class code so functions are one line, and just overall code clean up
+
 // final update as of 1/4/26:
 // fixed all of the things in this todo list
 
@@ -19,6 +24,8 @@ int main();
     // else if statement for gameover in Game() // 1/4/26: WHAT DOES THIS MEAN? 
 
 // very happy with the game. funny looking spaghetti code, but runs really smoothly.
+
+
 
 
 enum eDirection {
@@ -61,13 +68,13 @@ public:
         
     }
 
-    int GetX();
-    int GetY();
-    eDirection GetDir();
+    int GetX() {return xVal;};
+    int GetY() {return yVal;};
+    eDirection GetDir() {return nDir;};
 
-    void SetX(int num);
-    void SetY(int num);
-    void SetDir(eDirection inDir);
+    void SetX(int num) {xVal = num;};
+    void SetY(int num) {yVal = num;};
+    void SetDir(eDirection inDir) {nDir = inDir;};
 
 private:
     int xVal;
@@ -75,30 +82,6 @@ private:
     
     eDirection nDir;
 };
-
-int Snakes::GetX() {
-    return xVal;
-}
-
-int Snakes::GetY() {
-    return yVal;
-}
-
-eDirection Snakes::GetDir() {
-    return nDir;
-}
-
-void Snakes::SetX(int num) {
-    xVal = num;
-}
-
-void Snakes::SetY(int num) {
-    yVal = num;
-}
-
-void Snakes::SetDir(eDirection inDir) {
-    nDir = inDir;
-}
 
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -136,12 +119,7 @@ void Draw() {
     for (int i = 0; i < width-1; i++) {
         cout << "#";
     }
-
     cout << endl;
-
-    /*for (Snakes ma: snakeList) {
-        cout << ma.GetX() << " " << ma.GetY() << endl;
-    }*/
 
     // body/game part of board
     for (int i = 0; i < width; i++) {
@@ -175,24 +153,26 @@ void Draw() {
 
         cout << endl;
     }
-        
-
 
     // bottom line of board
     cout << " ";
     for (int i = 0; i < width - 1; i++) {
         cout << "#";
     }
+
+
     // Scoreboard/Debugging Information
-    /*if (!checked) {
+    if (!checked) {
+        cout << "\nScore: " << snakeList.size();
         cout << "\nHead/Tail information:\n";
         cout << "Fruit Location: X: " << fruitX << " Y: " << fruitY << endl;
         cout << "----   X | Y   ---- \n";
         for (int i = 0; i <= snakeList.size() - 1; i++) {
+            if (i > 3) break;
             cout << "Tail " << i << " " << snakeList[i].GetX() << " | " << snakeList[i].GetY() << endl; 
         }
         checked = true;
-    }*/
+    }
 }
 
 void CalculateNextXY() {
@@ -340,7 +320,7 @@ void Setup() {
     }
 
     while (!gameOver) {
-        //system("cls");
+        system("cls");
 
         Movement();
         Game();
